@@ -31,10 +31,10 @@ void loop() {
     int btn = (digitalRead(btnBit1))*10 + digitalRead(btnBit0);
     Serial.print(btn);
     switch (btn) {
-      case int(0): lcd.clear(); lcd.print(1); break;
-      case int(1): lcd.clear(); lcd.print(2); break;
-      case int(10): lcd.clear(); lcd.print(3); break;
-      case int(11): lcd.clear(); lcd.print(4); break;
+      case int(0): lcd.clear(); lcd.print("1"); break;
+      case int(1): lcd.clear(); lcd.print("2"); break;
+      case int(10): lcd.clear(); lcd.print("3"); break;
+      case int(11): lcd.clear(); lcd.print("4"); break;
     }
   }
 
