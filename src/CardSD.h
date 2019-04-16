@@ -12,7 +12,9 @@ public:
 protected:
   int stateSD();
   int typeSD();
+  int initSD();
   int createFile(String);
+  int writeFile(String, String);
   int readFile(String);
   int deleteFile(String);
 

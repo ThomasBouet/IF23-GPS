@@ -36,11 +36,15 @@ CardSD::typeSD(){
   }
 }
 
-CardSD::createFile(String fileName){
+CardSD::initSD(){
   if(!SD.begin(pinCS)){
     //échec de l'initialisation de la carte
     return 0;
   }
+}
+
+CardSD::createFile(String fileName){
+  initSD();
   //si le fichier n'existe pas je le créé
   if(!SD.exists(fileName)){
     sdFile = SD.open(fileName, FILE_WRITE);
@@ -59,7 +63,25 @@ CardSD::createFile(String fileName){
   }
 }
 
+CardSD::writeFile(String fileName,String content){
+  initSD();
+  if(!SD.exists(fileName)){
+    return 0;
+  }
+  sdFile = SD.open(fileName, FILE_WRITE);
+  if(sdFile){
+    sdFile.println(content);
+    sdFile.close();
+    return 1;
+  }else{
+    //le fichier n'est pas ouvert
+    return 0;
+  }
+}
+
+//utilité ?
 CardSD::readFile(String fileName){
+  initSD();
   if(!SD.exists(fileName)){
     return 0;
   }
@@ -76,6 +98,7 @@ CardSD::readFile(String fileName){
 }
 
 CardSD::deleteFile(String fileName){
+  initSD();
   if(!SD.exists(fileName)){
     //le fichier n'existe pas
     return -1;
@@ -88,3 +111,5 @@ CardSD::deleteFile(String fileName){
   //la suppression a fonctionnée
   return 1;
 }
+
+//
