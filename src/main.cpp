@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <LiquidCrystal.h>
-#include "ButtonsGPS.h"
 #include <SD.h>
 
+<<<<<<< HEAD
 
 //Menu
 const int SYSTEM = 0, GPS = 1, STATS = 2;
@@ -58,6 +58,10 @@ const int state[][4]={
 Sd2Card card;
 SdVolume volume;
 SdFile root;
+=======
+#include "ButtonsGPS.h"
+#include "CardSD.h"
+>>>>>>> a22d69ef1eeb9ab004a06c4adb8778fb7c69d71b
 
 //Control tension
 #define pinBat 14
@@ -69,8 +73,11 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 ButtonsGPS btn;
 
+<<<<<<< HEAD
 int currentState;
 
+=======
+>>>>>>> a22d69ef1eeb9ab004a06c4adb8778fb7c69d71b
 void setup() {
   Serial.begin(9600);
 
@@ -81,6 +88,7 @@ void setup() {
   currentState = SYSTEM;
 }
 
+<<<<<<< HEAD
 
 
 
@@ -161,5 +169,17 @@ void loop() {
 
     currentState = state[currentState][button];
 
+=======
+void loop() {
+
+  //Prend en compte la différence entre le 3.3V d'Arduino et le 3.25V Max de la batterie
+  //tension = (float(analogRead(pinBat))/1007.0)*6.5;
+  tension = (float)(analogRead(pinBat))/1023.0*6.5;
+  lcd.setCursor(0, 1);
+  lcd.print(tension);
+
+  lcd.setCursor(0, 0);
+  lcd.print(btn.readButtons());
+>>>>>>> a22d69ef1eeb9ab004a06c4adb8778fb7c69d71b
 
 }
