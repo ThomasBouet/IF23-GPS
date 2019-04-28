@@ -12,6 +12,8 @@ public:
 
 private:
   Bounce debouncer;
+  Bounce debouncerBP0;
+  Bounce debouncerBP1;
 
 
 };

@@ -10,22 +10,31 @@
   ButtonsGPS::ButtonsGPS()
   {
     debouncer = Bounce();
+    debouncerBP0 = Bounce();
+    debouncerBP1 = Bounce();
 
-    pinMode(pinBtn0, INPUT);
-    pinMode(pinBtn1, INPUT);
-    pinMode(pinBtnEn, INPUT);
+    pinMode(pinBtn0, INPUT_PULLUP);
+    pinMode(pinBtn1, INPUT_PULLUP);
+    pinMode(pinBtnEn, INPUT_PULLUP);
     debouncer.attach(pinBtnEn);
-    debouncer.interval(5); // interval in ms
-  }
+    debouncer.interval(10); // interval in ms
 
+    debouncerBP0.attach(pinBtn0);
+    debouncerBP0.interval(10);
+
+    debouncerBP1.attach(pinBtn1);
+    debouncerBP1.interval(10);
+  }
 
   ButtonsGPS::readButtons(){
     int state = 0;
 
     while(state == 0){
       debouncer.update();
-      if (debouncer.read()) {
-        switch (digitalRead(pinBtn1) * 2 + digitalRead(pinBtn0)) {
+      if (debouncer.rose()) {
+        debouncerBP0.update();
+        debouncerBP1.update();
+        switch (debouncerBP1.read() * 2 + debouncerBP0.read()) {
           case 0:
             state = 1;
             break;
@@ -42,47 +51,17 @@
             state = 4;
             break;
 
+          default:
+            state = 0;
+            break;
         }
-      }
 
+      }/*else{
+        return 0;
+      }*/
 
-
-
-
-
-      // while(state == 0){
-      //   debouncer.update();
-      //   if (debouncer.read()) {
-      //     switch (digitalRead(pinBtn1) * 2 + digitalRead(pinBtn0)) {
-      //       case 0:
-      //         return 1;
-      //         //break;
-      //
-      //       case 1:
-      //         return 2;
-      //       //  break;
-      //
-      //       case 2:
-      //         return 3;
-      //       //  break;
-      //
-      //       case 3:
-      //         return 4;
-      //       //  break;
-      //
-      //     }
-      //   }
-      // else{
-      //   //lcd.setCursor(0, 0);
-      //   return 0;
-      // }
 
     }
 
     return state;
   }
-
-
-
-
-//}
