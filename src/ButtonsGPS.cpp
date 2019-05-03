@@ -13,28 +13,39 @@
     debouncerBP0 = Bounce();
     debouncerBP1 = Bounce();
 
-    pinMode(pinBtn0, INPUT_PULLUP);
-    pinMode(pinBtn1, INPUT_PULLUP);
-    pinMode(pinBtnEn, INPUT_PULLUP);
+    pinMode(pinBtn0, INPUT);
+    pinMode(pinBtn1, INPUT);
+    pinMode(pinBtnEn, INPUT);
     debouncer.attach(pinBtnEn);
-    debouncer.interval(10); // interval in ms
+    debouncer.interval(5); // interval in ms
 
     debouncerBP0.attach(pinBtn0);
-    debouncerBP0.interval(10);
+    debouncerBP0.interval(5);
 
     debouncerBP1.attach(pinBtn1);
-    debouncerBP1.interval(10);
+    debouncerBP1.interval(5);
   }
 
   ButtonsGPS::readButtons(){
     int state = 0;
-
     while(state == 0){
       debouncer.update();
       if (debouncer.rose()) {
         debouncerBP0.update();
         debouncerBP1.update();
-        switch (debouncerBP1.read() * 2 + debouncerBP0.read()) {
+        if(debouncerBP1.read() == LOW && debouncerBP0.read() == LOW){
+          state = 1;
+        }
+        else if(debouncerBP1.read() == LOW && debouncerBP0.read() == HIGH){
+          state = 2;
+        }
+        else if(debouncerBP1.read() == HIGH && debouncerBP0.read() == LOW){
+          state = 3;
+        }
+        else if(debouncerBP1.read() == HIGH && debouncerBP0.read() == HIGH){
+          state = 4;
+        }
+        /*switch (debouncerBP1.read() * 2 + debouncerBP0.read()) {
           case 0:
             state = 1;
             break;
@@ -54,11 +65,13 @@
           default:
             state = 0;
             break;
-        }
+        }*/
+        Serial.print("State : ");Serial.println(state);
+        Serial.print("BP1 ");Serial.print(debouncerBP1.read());Serial.print(" BP0 ");Serial.println(debouncerBP0.read());
 
-      }else{
+      }/*else{
         return 0;
-      }
+      }*/
 
 
     }

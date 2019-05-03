@@ -31,6 +31,7 @@ const String titleMenu [] = {
   "Battery", "SD_Size", "SD_Form", "USB", "GPS_Rec"
 };
 
+int button;
 int currentState;
 int isDoingSmth = 0;
 
@@ -42,11 +43,14 @@ void battery(){
   lcd.print(tension);
   lcd.setCursor(3, 1);
   lcd.print("V");
-  if(btn.readButtons() == 4){
-    lcd.clear();
+
+  if(btn.readButtons() != 0){
     isDoingSmth = 0;
+    lcd.setCursor(3, 1);
+    lcd.print("     ");
     return;
   }
+
 }
 
 void setup() {
@@ -54,45 +58,15 @@ void setup() {
   lcd.begin(8, 2);
   pinMode(pinBat, INPUT);
   currentState = BATTERY;
+  button = 0;
 }
 
 void loop() {
-  Serial.print("state before btn pressed ");
-  Serial.println(titleMenu[currentState]);
-  //maj de l'état
-  int button = btn.readButtons();
-  Serial.print("button ");
-  Serial.println(button);
-  Serial.print("state when btn pressed ");
-  Serial.println(titleMenu[currentState]);
-  switch (button) {
-    case 1 :
-    //état batterie par défaut
-      currentState = 0;
-      lcd.clear();
-      break;
-    case 2 :
-      currentState++;
-      if(currentState >= MENU_SIZE){
-        currentState =  MENU_SIZE-1;
-      }
-      lcd.clear();
-      break;
-    case 3 :
-      currentState--;
-      if(currentState <= 0){
-        currentState = 0;
-      }
-      lcd.clear();
-      break;
-    case 4 :
-      isDoingSmth = 1;
-      break;
-  }
-
-  // lcd.clear();
+  Serial.print("Current State :");Serial.println(titleMenu[currentState]);
+  lcd.clear();
   lcd.setCursor(0,0);
   lcd.print(titleMenu[currentState]);
+
   switch(currentState){
     case BATTERY :
       lcd.setCursor(0,1);
@@ -118,6 +92,30 @@ void loop() {
       lcd.print(currentState);
       break;
   }
-  Serial.print("state after btn pressed ");
+
   Serial.println(titleMenu[currentState]);
+  switch (btn.readButtons()) {
+    case 1 :
+      //état batterie par défaut
+      currentState = 0;
+      // lcd.clear();
+      break;
+    case 2 :
+      currentState++;
+      if(currentState >= MENU_SIZE){
+        currentState =  MENU_SIZE-1;
+      }
+      // lcd.clear();
+      break;
+    case 3 :
+      currentState--;
+      if(currentState <= 0){
+        currentState = 0;
+      }
+      // lcd.clear();
+      break;
+    case 4 :
+      isDoingSmth = 1;
+      break;
+  }
 }
