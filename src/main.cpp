@@ -38,29 +38,11 @@ int isDoingSmth = 0;
 
 ButtonsGPS btn;
 //petit rappel : déclarer les fonctions avant la boucle loop
-<<<<<<< HEAD
 void battery();
 
 TinyGPS gps;
 const int GPS_RX = 3, GPS_TX = 2;
 SoftwareSerial ss(GPS_TX, GPS_RX);
-=======
-void battery(){
-  lcd.setCursor(4, 1);
-  tension = (float)(analogRead(pinBat))/1023.0*6.5;
-  lcd.print(tension);
-  lcd.setCursor(3, 1);
-  lcd.print("V");
-
-  if(btn.readButtons() != 0){
-    isDoingSmth = 0;
-    lcd.setCursor(3, 1);
-    lcd.print("     ");
-    return;
-  }
-
-}
->>>>>>> 6158a9af8336b571023d7811d3f479a32d6a53ef
 
 void setup() {
   Serial.begin(9600);
@@ -68,7 +50,6 @@ void setup() {
   lcd.begin(8, 2);
   pinMode(pinBat, INPUT);
   currentState = BATTERY;
-<<<<<<< HEAD
   Serial.println("Initialisation");
 }
 
@@ -148,14 +129,6 @@ void loop() {
   }
 
   // lcd.clear();
-=======
-  button = 0;
-}
-
-void loop() {
-  Serial.print("Current State :");Serial.println(titleMenu[currentState]);
-  lcd.clear();
->>>>>>> 6158a9af8336b571023d7811d3f479a32d6a53ef
   lcd.setCursor(0,0);
   lcd.print(titleMenu[currentState]);
 
@@ -184,7 +157,6 @@ void loop() {
       lcd.print(currentState);
       break;
   }
-<<<<<<< HEAD
   Serial.print("state after btn pressed ");
   Serial.println(titleMenu[currentState]);*/
 }
@@ -199,32 +171,5 @@ void battery(){
     lcd.clear();
     isDoingSmth = 0;
     return;
-=======
-
-  Serial.println(titleMenu[currentState]);
-  switch (btn.readButtons()) {
-    case 1 :
-      //état batterie par défaut
-      currentState = 0;
-      // lcd.clear();
-      break;
-    case 2 :
-      currentState++;
-      if(currentState >= MENU_SIZE){
-        currentState =  MENU_SIZE-1;
-      }
-      // lcd.clear();
-      break;
-    case 3 :
-      currentState--;
-      if(currentState <= 0){
-        currentState = 0;
-      }
-      // lcd.clear();
-      break;
-    case 4 :
-      isDoingSmth = 1;
-      break;
->>>>>>> 6158a9af8336b571023d7811d3f479a32d6a53ef
   }
 }
