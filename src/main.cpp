@@ -3,7 +3,8 @@
 #include <LiquidCrystal.h>
 #include <SD.h>
 #include <ButtonsGPS.h>
-#include "menu.h"
+#include <SoftwareSerial.h>
+#include <TinyGPS.h>
 
 //Carte SD
 #define pinSD A0
@@ -36,27 +37,63 @@ int isDoingSmth = 0;
 
 ButtonsGPS btn;
 //petit rappel : déclarer les fonctions avant la boucle loop
-void battery(){
-  lcd.setCursor(4, 1);
-  tension = (float)(analogRead(pinBat))/1023.0*6.5;
-  lcd.print(tension);
-  lcd.setCursor(3, 1);
-  lcd.print("V");
-  if(btn.readButtons() == 4){
-    lcd.clear();
-    isDoingSmth = 0;
-    return;
-  }
-}
+void battery();
+
+TinyGPS gps;
+const int GPS_RX = 3, GPS_TX = 2;
+SoftwareSerial ss(GPS_TX, GPS_RX);
 
 void setup() {
   Serial.begin(9600);
+  ss.begin(4800);
   lcd.begin(8, 2);
   pinMode(pinBat, INPUT);
   currentState = BATTERY;
+  Serial.println("Initialisation");
 }
 
 void loop() {
+  bool newData = false;
+  unsigned long chars;
+  unsigned short sentences, failed;
+
+  // For one second we parse GPS data and report some key values
+  for (unsigned long start = millis(); millis() - start < 1000;)
+  {
+    while (ss.available())
+    {
+      char c = ss.read();
+      // Serial.write(c); // uncomment this line if you want to see the GPS data flowing
+      if (gps.encode(c)) // Did a new valid sentence come in?
+        newData = true;
+    }
+  }
+
+  if (newData)
+  {
+    float flat, flon;
+    unsigned long age;
+    gps.f_get_position(&flat, &flon, &age);
+    Serial.print("LAT=");
+    Serial.print(flat == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : flat, 6);
+    Serial.print(" LON=");
+    Serial.print(flon == TinyGPS::GPS_INVALID_F_ANGLE ? 0.0 : flon, 6);
+    Serial.print(" SAT=");
+    Serial.print(gps.satellites() == TinyGPS::GPS_INVALID_SATELLITES ? 0 : gps.satellites());
+    Serial.print(" PREC=");
+    Serial.print(gps.hdop() == TinyGPS::GPS_INVALID_HDOP ? 0 : gps.hdop());
+  }
+
+  gps.stats(&chars, &sentences, &failed);
+  Serial.print(" CHARS=");
+  Serial.print(chars);
+  Serial.print(" SENTENCES=");
+  Serial.print(sentences);
+  Serial.print(" CSUM ERR=");
+  Serial.println(failed);
+  if (chars == 0)
+    Serial.println("** No characters received from GPS: check wiring **");
+  /*
   Serial.print("state before btn pressed ");
   Serial.println(titleMenu[currentState]);
   //maj de l'état
@@ -119,5 +156,18 @@ void loop() {
       break;
   }
   Serial.print("state after btn pressed ");
-  Serial.println(titleMenu[currentState]);
+  Serial.println(titleMenu[currentState]);*/
+}
+
+void battery(){
+  lcd.setCursor(4, 1);
+  tension = (float)(analogRead(pinBat))/1023.0*6.5;
+  lcd.print(tension);
+  lcd.setCursor(3, 1);
+  lcd.print("V");
+  if(btn.readButtons() == 4){
+    lcd.clear();
+    isDoingSmth = 0;
+    return;
+  }
 }
