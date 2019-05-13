@@ -23,7 +23,7 @@ void battery(){
 }
 
 void gpsLocation(){
-  Serial.println(pgps.getLocation());
+  Serial.println(String(pgps.getLocation()));
   if(btn.readButtons() == 4){
     lcd.clear();
     isDoingSmth = 0;

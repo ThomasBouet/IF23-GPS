@@ -9,24 +9,26 @@ ProjectGPS::ProjectGPS(){
   ss.begin(4800);
 }
 
-String ProjectGPS::getLocation(){
+String ProjectGPS::getLocation()
+{
+  bool newData = false;
   unsigned long chars;
-  int i = 0;
-  while (ss.available() > 0 && i < 10){
+
+  while (ss.available()){
     char c = ss.read();
+    Serial.write(c);
     if (gps.encode(c)){
-      return displayInfo();
-    }else{
-      return String(c);
+      newData = true;
     }
-    i++;
   }
-  return "La fonction n'a pas foctionnée";
+
+  if(newData){}
+  return displayInfo();
 }
 
 String ProjectGPS::displayInfo()
 {
-  String str= "Location: ";
+  String str = "Location: ";
   if (gps.location.isValid())
   {
     str = str + String(gps.location.lat(), 6);
