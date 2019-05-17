@@ -4,10 +4,20 @@
 
 Sd2Card sd;
 File sdFile;
+File root;
 
 CardSD::CardSD()
 {
-//do not know what to put here
+switch(stateSD()){
+  case 0:
+    Serial.println("Carte mal insérée/Mauvais branchement/Mauvais pin");
+    break;
+  case 1:
+    Serial.println("Branchement correct et carte insérée");
+    break;
+}
+Serial.print("SD de type "); Serial.println(typeSD());
+root = SD.open("/");
 }
 
 CardSD::stateSD(){
@@ -34,6 +44,10 @@ CardSD::typeSD(){
     default:
       return 0;
   }
+}
+
+SDLib::File CardSD::getRoot(){
+  return root;
 }
 
 CardSD::initSD(){
@@ -88,7 +102,7 @@ CardSD::readFile(String fileName){
   sdFile = SD.open(fileName);
   if(sdFile){
     while(sdFile.available()){
-      //read the content
+      Serial.write(sdFile.read());
     }
     sdFile.close();
   }else{
@@ -112,4 +126,28 @@ CardSD::deleteFile(String fileName){
   return 1;
 }
 
+void CardSD::printDirectory(File dir, int numTabs) {
+  initSD();
+  while (true) {
+
+    File entry =  dir.openNextFile();
+    if (! entry) {
+      // no more files
+      break;
+    }
+    for (uint8_t i = 0; i < numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println("/");
+      printDirectory(entry, numTabs + 1);
+    } else {
+      // files have sizes, directories do not
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+}
 //

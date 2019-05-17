@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>
-#include <SD.h>
+#include <CardSD.h>
 #include <ButtonsGPS.h>
 #include <ProjectGPS.h>
 
@@ -29,9 +29,7 @@
 LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 //sd
-Sd2Card card;
-SdVolume volume;
-SdFile root;
+CardSD sdCard;
 
 //buttons
 ButtonsGPS btn;

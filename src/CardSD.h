@@ -8,6 +8,8 @@ class CardSD{
 
 public:
   CardSD();
+  SDLib::File getRoot();
+  void printDirectory(SDLib::File, int);
 
 protected:
   int stateSD();

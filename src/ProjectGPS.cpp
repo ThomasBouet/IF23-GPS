@@ -16,13 +16,12 @@ String ProjectGPS::getLocation()
 
   while (ss.available()){
     char c = ss.read();
-    Serial.write(c);
+    //Serial.write(c);
     if (gps.encode(c)){
       newData = true;
     }
   }
 
-  if(newData){}
   return displayInfo();
 }
 
