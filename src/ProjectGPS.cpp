@@ -3,26 +3,28 @@
 #define GPS_TX 2
 #define GPS_RX 3
 
-SoftwareSerial ss(GPS_RX, GPS_TX);
+SoftwareSerial ss(GPS_TX, GPS_RX);
 
 ProjectGPS::ProjectGPS(){
   ss.begin(4800);
 }
 
-String ProjectGPS::getLocation()
+void ProjectGPS::getLocation()
 {
-  bool newData = false;
   unsigned long chars;
-
+  Serial.println(ss.isListening());
   while (ss.available()){
+    Serial.println("truc");
     char c = ss.read();
-    //Serial.write(c);
-    if (gps.encode(c)){
-      newData = true;
+    //
+    Serial.write(c);
+    while (!gps.encode(c)){
+      Serial.write(c);
+      Serial.println("Trame incomplète");
     }
   }
-
-  return displayInfo();
+  Serial.println("J'ai une trame complète");
+  //return displayInfo();
 }
 
 String ProjectGPS::displayInfo()

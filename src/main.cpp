@@ -53,10 +53,10 @@ void loop() {
     case SD_FORM :
       lcd.setCursor(0,1);
       lcd.print(currentState);
-      if (isDoingSmth == 1){
+      /*if (isDoingSmth == 1){
         Serial.println("Dans ma sd il y a :");
         sdCard.printDirectory(sdCard.getRoot(), 0);
-      }
+      }*/
       break;
     case USB :
       lcd.setCursor(0,1);
