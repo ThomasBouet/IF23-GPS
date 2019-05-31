@@ -24,7 +24,7 @@
     debouncerBP1.interval(5);
   }
 
-  ButtonsGPS::readButtons(){
+  int ButtonsGPS::readButtons(){
     int state;
     debouncer.update();
     debouncerBP0.update();

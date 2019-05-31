@@ -3,7 +3,7 @@
 #define GPS_TX 2
 #define GPS_RX 3
 
-SoftwareSerial ss(GPS_TX, GPS_RX);
+SoftwareSerial ss(GPS_RX, GPS_TX);
 
 ProjectGPS::ProjectGPS(){
   ss.begin(4800);
@@ -11,69 +11,66 @@ ProjectGPS::ProjectGPS(){
 
 void ProjectGPS::getLocation()
 {
-  unsigned long chars;
-  Serial.println(ss.isListening());
-  while (ss.available()){
-    Serial.println("truc");
-    char c = ss.read();
-    //
-    Serial.write(c);
-    while (!gps.encode(c)){
-      Serial.write(c);
-      Serial.println("Trame incomplète");
-    }
+  Serial.println("gps started");
+  int t = millis();
+  while (ss.available() > 0)
+    if (gps.encode(ss.read()))
+      displayInfo();
+  if (millis() > t+6000 && gps.charsProcessed() < 10)
+  {
+    Serial.println(F("No GPS detected: check wiring"));
+    while(true);
   }
-  Serial.println("J'ai une trame complète");
   //return displayInfo();
 }
 
-String ProjectGPS::displayInfo()
+void ProjectGPS::displayInfo()
 {
-  String str = "Location: ";
+  Serial.print(F("Location: "));
   if (gps.location.isValid())
   {
-    str = str + String(gps.location.lat(), 6);
-    str = str + ", ";
-    str = str + String(gps.location.lng(), 6);
+    Serial.print(gps.location.lat(), 6);
+    Serial.print(F(","));
+    Serial.print(gps.location.lng(), 6);
   }
   else
   {
-    str = str + "INVALID";
+    Serial.print(F("INVALID"));
   }
 
-  str = str + "  Date/Time: ";
+  Serial.print(F("  Date/Time: "));
   if (gps.date.isValid())
   {
-    str = str + gps.date.month();
-    str = str + "/";
-    str = str + gps.date.day();
-    str = str + "/";
-    str = str + gps.date.year();
+    Serial.print(gps.date.month());
+    Serial.print(F("/"));
+    Serial.print(gps.date.day());
+    Serial.print(F("/"));
+    Serial.print(gps.date.year());
   }
   else
   {
-    str = str + "INVALID";
+    Serial.print(F("INVALID"));
   }
 
-  str = str + " ";
+  Serial.print(F(" "));
   if (gps.time.isValid())
   {
-    if (gps.time.hour() < 10) str = str + "0";
-    str = str + gps.time.hour();
-    str = str + ":";
-    if (gps.time.minute() < 10) str = str + "0";
-    str = str + gps.time.minute();
-    str = str + ":";
-    if (gps.time.second() < 10) str = str + "0";
-    str = str + gps.time.second();
-    str = str + ".";
-    if (gps.time.centisecond() < 10) str = str + "0";
-    str = str + gps.time.centisecond();
+    if (gps.time.hour() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.hour());
+    Serial.print(F(":"));
+    if (gps.time.minute() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.minute());
+    Serial.print(F(":"));
+    if (gps.time.second() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.second());
+    Serial.print(F("."));
+    if (gps.time.centisecond() < 10) Serial.print(F("0"));
+    Serial.print(gps.time.centisecond());
   }
   else
   {
-    str = str + "INVALID";
+    Serial.print(F("INVALID"));
   }
 
-  return str;
+  Serial.println();
 }

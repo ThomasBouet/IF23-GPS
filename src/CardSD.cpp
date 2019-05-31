@@ -20,7 +20,7 @@ Serial.print("SD de type "); Serial.println(typeSD());
 root = SD.open("/");
 }
 
-CardSD::stateSD(){
+int CardSD::stateSD(){
   if (!sd.init(SPI_HALF_SPEED, pinCS)) {
       //carte pas insérée, mauvais branchement, mauvais pin
       return 0;
@@ -30,7 +30,7 @@ CardSD::stateSD(){
     }
 }
 
-CardSD::typeSD(){
+int CardSD::typeSD(){
   switch (sd.type()) {
     case SD_CARD_TYPE_SD1:
       return 1;

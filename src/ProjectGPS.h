@@ -1,7 +1,7 @@
 #ifndef DEF_PROJECTGPS
 #define DEF_PROJECTGPS
 
-#include <TinyGPS.h>
+#include <TinyGPS++.h>
 #include <SoftwareSerial.h>
 
 class ProjectGPS{
@@ -11,10 +11,10 @@ public:
   void getLocation();
 
 protected:
-  String displayInfo();
+  void displayInfo();
 
 private:
-  TinyGPS gps;
+  TinyGPSPlus gps;
 
 };
 
