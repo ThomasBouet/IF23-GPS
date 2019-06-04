@@ -93,6 +93,14 @@ CardSD::writeFile(String fileName,String content){
   }
 }
 
+CardSD::existingFile(String fileName){
+  initSD();
+  if(!SD.exists(fileName)){
+    return 0;
+  }else{
+    return 1;
+  }
+}
 //utilité ?
 CardSD::readFile(String fileName){
   initSD();

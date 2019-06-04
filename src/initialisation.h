@@ -1,13 +1,12 @@
 #include <LiquidCrystal.h>
 #include <CardSD.h>
 #include <ButtonsGPS.h>
-#include <ProjectGPS.h>
+#include <SoftwareSerial.h>
+#include <TinyGPS++.h>
 
 //pin
-/*
 #define GPS_TX 2
 #define GPS_RX 3
-*/
 #define LCD_RS 4
 #define LCD_E 5
 #define LCD_D4 6
@@ -30,6 +29,8 @@ LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 //sd
 CardSD sdCard;
+int fileIndex;
+bool isWriting;
 
 //buttons
 ButtonsGPS btn;
@@ -51,4 +52,6 @@ int isDoingSmth = 0;
 float tension;
 
 //GPS
-ProjectGPS pgps;
+TinyGPSPlus gps;
+SoftwareSerial ss(GPS_RX, GPS_TX);
+int temps;

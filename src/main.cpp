@@ -31,6 +31,7 @@ void loop() {
       break;
     case 4 :
       isDoingSmth = 1;
+      temps = millis();
       break;
   }
 
@@ -66,7 +67,7 @@ void loop() {
       lcd.setCursor(0,1);
       lcd.print(currentState);
       if(isDoingSmth == 1){
-        gpsLocation();
+        gpsLocation(temps);
       }
       break;
   }

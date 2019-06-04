@@ -10,16 +10,16 @@ public:
   CardSD();
   SDLib::File getRoot();
   void printDirectory(SDLib::File, int);
-
-protected:
-  int stateSD();
-  int typeSD();
-  int initSD();
+  int existingFile(String);
   int createFile(String);
   int writeFile(String, String);
   int readFile(String);
   int deleteFile(String);
 
 
+protected:
+  int stateSD();
+  int typeSD();
+  int initSD();
 };
 #endif
