@@ -25,6 +25,21 @@ void battery(){
   }
 }
 
+void readRun(){
+  int i = 1;
+  String str = i+".txt";
+  while(sdCard.existingFile(str) == 1){
+    sdCard.readFile(str);
+    i++;
+    str = i+".txt";
+  }
+  if(sdCard.existingFile(str) == 0){
+    Serial.println("Tous les fichiers parcourus");
+    lcd.setCursor(0,1);
+    lcd.print("Fin");
+  }
+}
+
 static String printInt(unsigned long val, bool valid, int len)
 {
   String str = "";
@@ -90,31 +105,15 @@ static String printDateTime(TinyGPSDate &d, TinyGPSTime &t)
   return str;
 }
 
-static String printStr(const char *str, int len)
+String displayInfo(int p)
 {
-  String stri = "";
-  int slen = strlen(str);
-  for (int i=0; i<len; ++i)
-    stri += String(i<slen ? str[i] : ' ');
-  return stri;
-}
-
-String displayInfo()
-{
-  String str = "";
-  str += printInt(gps.satellites.value(), gps.satellites.isValid(), 5);
-  str += printFloat(gps.hdop.hdop(), gps.hdop.isValid(), 6, 1);
+  String str = "Point"+String(p)+" ";
   str += printFloat(gps.location.lat(), gps.location.isValid(), 11, 6);
   str += printFloat(gps.location.lng(), gps.location.isValid(), 12, 6);
-  str += printInt(gps.location.age(), gps.location.isValid(), 5);
-  str += printDateTime(gps.date, gps.time);
   str += printFloat(gps.altitude.meters(), gps.altitude.isValid(), 7, 2);
-  str += printFloat(gps.course.deg(), gps.course.isValid(), 7, 2);
-  str += printFloat(gps.speed.kmph(), gps.speed.isValid(), 6, 2);
-  str += printStr(gps.course.isValid() ? TinyGPSPlus::cardinal(gps.course.deg()) : "*** ", 6);
-  str += printInt(gps.charsProcessed(), true, 6);
-  str += printInt(gps.sentencesWithFix(), true, 10);
-  str += printInt(gps.failedChecksum(), true, 9);
+  str += printDateTime(gps.date, gps.time);
+  str += printFloat(gps.hdop.hdop(), gps.hdop.isValid(), 6, 1);
+  str += printInt(gps.satellites.value(), gps.satellites.isValid(), 5);
   return str;
 }
 
@@ -130,18 +129,18 @@ void gpsLocation(int t){
     if(sdCard.createFile(file) == 1){
       isWriting = true;
       sdCard.writeFile(file, file);
-      sdCard.writeFile(file, String("Sats HDOP  Latitude   Longitude   Fix  Date       Time     Date Alt    Course Speed Card   Chars Sentences Checksum"));
-      sdCard.writeFile(file, String("           (deg)      (deg)       Age                      Age  (m)    --- from GPS ----   RX    RX        Fail"));
-      sdCard.writeFile(file, String("------------------------------------------------------------------------------------------------------------------"));
+      sdCard.writeFile(file, String("Latitude,Longitude,Altitude,Date,HDOP,Satellites"));
     }
   }else{
+    int pt = 1;
     while (ss.available() > 0){
       if (gps.encode(ss.read())){
         lcd.print("sig fond");
         if(gps.location.isValid()){
-          String content = displayInfo();
+          String content = displayInfo(pt);
           Serial.println(content);
           sdCard.writeFile(file, content);
+          pt++;
         }
       }
       if(btn.readButtons() == 4){

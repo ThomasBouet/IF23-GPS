@@ -50,14 +50,14 @@ SDLib::File CardSD::getRoot(){
   return root;
 }
 
-CardSD::initSD(){
+int CardSD::initSD(){
   if(!SD.begin(pinCS)){
     //échec de l'initialisation de la carte
     return 0;
   }
 }
 
-CardSD::createFile(String fileName){
+int CardSD::createFile(String fileName){
   initSD();
   //si le fichier n'existe pas je le créé
   if(!SD.exists(fileName)){
@@ -77,7 +77,7 @@ CardSD::createFile(String fileName){
   }
 }
 
-CardSD::writeFile(String fileName,String content){
+int CardSD::writeFile(String fileName,String content){
   initSD();
   if(!SD.exists(fileName)){
     return 0;
@@ -93,7 +93,7 @@ CardSD::writeFile(String fileName,String content){
   }
 }
 
-CardSD::existingFile(String fileName){
+int CardSD::existingFile(String fileName){
   initSD();
   if(!SD.exists(fileName)){
     return 0;
@@ -102,7 +102,7 @@ CardSD::existingFile(String fileName){
   }
 }
 //utilité ?
-CardSD::readFile(String fileName){
+int CardSD::readFile(String fileName){
   initSD();
   if(!SD.exists(fileName)){
     return 0;
@@ -117,21 +117,6 @@ CardSD::readFile(String fileName){
     //le fichier ne s'est pas ouvert
     return 0;
   }
-}
-
-CardSD::deleteFile(String fileName){
-  initSD();
-  if(!SD.exists(fileName)){
-    //le fichier n'existe pas
-    return -1;
-  }
-  SD.remove(fileName);
-  if(SD.exists(fileName)){
-    //la suppression a échouée
-    return 0;
-  }
-  //la suppression a fonctionnée
-  return 1;
 }
 
 void CardSD::printDirectory(File dir, int numTabs) {
