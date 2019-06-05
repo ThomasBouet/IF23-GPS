@@ -1,12 +1,13 @@
 #include <Arduino.h>
-#include <Wire.h>
 #include <functions.h>
+
 
 void setup() {
   initProject();
 }
 
 void loop() {
+  refreshGPS();
   //maj de l'état
   int button = btn.readButtons();
   switch (button) {
@@ -31,7 +32,7 @@ void loop() {
       break;
     case 4 :
       isDoingSmth = 1;
-      temps = millis();
+      pt = 0;
       break;
   }
 
@@ -56,7 +57,7 @@ void loop() {
       lcd.print(currentState);
       if (isDoingSmth == 1){
         Serial.println("Dans ma sd il y a :");
-        sdCard.printDirectory(sdCard.getRoot(), 0);
+        //sdCard.printDirectory(sdCard.getRoot(), 0);
       }
       break;
     case USB :
@@ -70,8 +71,10 @@ void loop() {
       lcd.setCursor(0,1);
       lcd.print(currentState);
       if(isDoingSmth == 1){
-        gpsLocation(temps);
+        gpsLocation();
       }
       break;
   }
+
+  delay(10);
 }

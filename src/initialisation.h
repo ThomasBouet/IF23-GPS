@@ -1,9 +1,10 @@
+//#include <Wire.h>
 #include <LiquidCrystal.h>
-#include <CardSD.h>
 #include <ButtonsGPS.h>
 #include <SoftwareSerial.h>
 #include <TinyGPS++.h>
-
+#include <SPI.h>
+#include <SD.h>
 //pin
 #define GPS_TX 2
 #define GPS_RX 3
@@ -28,7 +29,7 @@
 LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 //sd
-CardSD sdCard;
+File dFile;
 int fileIndex;
 bool isWriting;
 
@@ -54,4 +55,4 @@ float tension;
 //GPS
 TinyGPSPlus gps;
 SoftwareSerial ss(GPS_RX, GPS_TX);
-int temps;
+int pt;
