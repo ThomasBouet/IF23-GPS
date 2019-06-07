@@ -1,14 +1,29 @@
 #include <Arduino.h>
 #include <functions.h>
 
-
 void setup() {
-  initProject();
+  Serial.begin(9600);
+  ss.begin(4800);
+  lcd.begin(8, 2);
+  pinMode(VBAT, INPUT);
+  currentState = BATTERY;
+  pt = 1;
+  if (!SD.begin(SD_CS)) {
+    //carte pas insérée, mauvais branchement, mauvais pin
+    Serial.println("Carte mal insérée/Mauvais branchement/Mauvais pin");
+  } else {
+   //Branchement correct et carte insérée
+    Serial.println("Branchement correct et carte insérée");
+  }
+  char str[10] = "string";
+  float truc = 12.34;
+  dtostrf(truc, 2, 1, str);
+ 
+  Serial.println(str);
 }
 
 void loop() {
-  refreshGPS();
-  //maj de l'état
+  
   int button = btn.readButtons();
   switch (button) {
     case 1 :
@@ -44,9 +59,7 @@ void loop() {
     case BATTERY :
       lcd.setCursor(0,1);
       lcd.print(currentState);
-      if(isDoingSmth == 1){
-        battery();
-      }
+      battery();
       break;
     case SD_SIZE :
       lcd.setCursor(0,1);
@@ -55,10 +68,6 @@ void loop() {
     case SD_FORM :
       lcd.setCursor(0,1);
       lcd.print(currentState);
-      if (isDoingSmth == 1){
-        Serial.println("Dans ma sd il y a :");
-        //sdCard.printDirectory(sdCard.getRoot(), 0);
-      }
       break;
     case USB :
       lcd.setCursor(0,1);
@@ -75,6 +84,7 @@ void loop() {
       }
       break;
   }
-
+refreshGPS();
+  //maj de l'état
   delay(10);
 }

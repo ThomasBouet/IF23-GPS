@@ -1,24 +1,4 @@
 #include <initialisation.h>
-#include <ButtonsGPS.h>
-
-//setup
-void initProject(){
-  Serial.begin(9600);
-  ss.begin(4800);
-  lcd.begin(8, 2);
-  pinMode(VBAT, INPUT);
-  currentState = BATTERY;
-  fileIndex = 1;
-  pt = 1;
-
-  if (!SD.begin(SD_CS)) {
-      //carte pas insérée, mauvais branchement, mauvais pin
-      Serial.println("Carte mal insérée/Mauvais branchement/Mauvais pin");
-    } else {
-      //Branchement correct et carte insérée
-      Serial.println("Branchement correct et carte insérée");
-    }
-}
 
 void battery(){
   lcd.setCursor(4, 1);
@@ -33,18 +13,22 @@ void battery(){
 }
 
 void readRun(){
-  int i = 1;
-  String str = i+".txt";
-  /*while(sdCard.existingFile(str) == 1){
-    sdCard.readFile(str);
-    i++;
-    str = i+".txt";
+  String str = "Trajet.txt";
+  Serial.println(str);
+  dFile = SD.open(str);
+  if (dFile) {
+    Serial.println("contenu :");
+    // read from the file until there's nothing else in it:
+    while (dFile.available()) {
+      Serial.write(dFile.read());
+    }
+    // close the file:
+    dFile.close();
+  } else {
+    // if the file didn't open, print an error:
+    Serial.println("Trajet.txt : error opening ");
   }
-  if(sdCard.existingFile(str) == 0){
-    Serial.println("Tous les fichiers parcourus");
-    lcd.setCursor(0,1);
-    lcd.print("Fin");
-  }*/
+  isDoingSmth = 0;
 }
 
 
@@ -52,105 +36,159 @@ String printDateTime()
 {
   String str = "";
   if (gps.time.isValid()){
-          if (gps.time.hour() < 10) str += "0";
-          str += String(gps.time.hour()+2) + ":";
-          if (gps.time.minute() < 10) str += "0";
-          str += String(gps.time.minute()) + ":";
-          if (gps.time.second() < 10) str += "0";
-          str += String(gps.time.second());
-          str += ";";
-        }
-        else{
-          str += "TIME INVALID;";
-}
+
+    if (gps.time.hour() < 10) str += "0";
+    str += String(gps.time.hour()+2);
+    str += ":";
+    if (gps.time.minute() < 10) str += "0";
+    str += String(gps.time.minute());
+    str += ":";
+    if (gps.time.second() < 10) str += "0";
+    str += String(gps.time.second());  
+
+  }else{
+
+    str += "TIME INVALID";
+
+  }
+
+  str += ";";
   return str;
+
 }
 
-String displayInfo(int p)
-{
-  String str = "Point"+String(p)+";";
+String displayInfo(int p){
+  String str = "Point";
+  Serial.println(str);
   if(gps.location.isValid()){
-    str += String(gps.location.lat(), 6)+";";
-    str += String(gps.location.lng(), 6)+";";
-  }else{
-    str += "LAT INVALID;LNG INVALID;";
-  }
 
+    str += String(gps.location.lat(), 6);
+    str += ";";
+    str += String(gps.location.lng(), 6);
+
+  }else{
+    str += "LAT INVALID;LNG INVALID";
+
+  }
+  Serial.println(str);
+  str += ";";
+  Serial.println(str);
   if(gps.altitude.isValid()){
-    str += String(gps.altitude.meters(), 2)+";";
-  }else{
-    str += "ALT INVALID;";
-  }
 
+    str += String(gps.altitude.meters(), 2);
+
+  }else{
+    str += "ALT INVALID";
+
+  }
+  Serial.println(str);
+  str += ";";
+  Serial.println(str);
   str += printDateTime();
-
+  Serial.println(str);
   if(gps.hdop.isValid()){
-    str += String(gps.hdop.hdop(), 1)+";";
-  }else{
-    str += "HDOP INVALID;";
-  }
+   
+    str += String(gps.hdop.hdop(), 6);
 
+  }else{
+
+    str += "HDOP INVALID";
+
+  }
+  Serial.println(str);
+  str += ";";
+  Serial.println(str);
   if(gps.satellites.isValid()){
-    str += String(gps.satellites.value())+";";
-  }else{
-    str += "SAT INVALID;";
-  }
 
+    str += String(gps.satellites.value(), 6);
+
+  }else{
+
+    str += "SAT INVALID";
+
+  }
+  Serial.println(str);
+  str += ";";
+  Serial.println(str);
   return str;
 }
 
 void gpsLocation(){
   lcd.setCursor(0, 1);
   lcd.print("Wait sig");
-  String file = String(fileIndex)+".txt";
-  if(!isWriting){
-    while(SD.exists(file)){
-      fileIndex++;
-      file = String(fileIndex)+".txt";
-    }
+  String file = "Trajet.txt";
+  Serial.println(file);
+  if(SD.exists(file)){
+
     dFile = SD.open(file, FILE_WRITE);
+
     if(dFile){
-      Serial.println(String(file)+" a été créé");
+
+      Serial.print(file);Serial.println(" a été créé");
+
     }else{
-      Serial.println(String(file)+" : ECHEC");
+
+      Serial.print(file);Serial.println(" : ECHEC");
+
     }
+
     dFile.close();
-    if(SD.exists(file) == 1){
+
+    if(SD.exists(file) == true){
+
       isWriting = true;
-      Serial.println(file);
-      //sdCard.writeFile(file, file);
+      Serial.print(file);Serial.println(" exist");
       dFile = SD.open(file, FILE_WRITE);
+
       if(dFile){
+
         dFile.println(file);
         dFile.println("Latitude,Longitude,Altitude,Date,HDOP,Satellites");
+        dFile.close();
+
       }else{
-        Serial.println(String(file)+" : ECHEC");
+
+        Serial.print(file);Serial.println(" : ECHEC de la création");
+
       }
-      dFile.close();
     }
   }else{
-    file = String(fileIndex)+".txt";
+
     String content = displayInfo(pt);
-    Serial.println(content);
+    Serial.println("working ?");
     dFile = SD.open(file, FILE_WRITE);
+    Serial.println(dFile);
     if(dFile){
+
       dFile.println(content);
       pt++;
+      delay(1000);
+      
+
     }else{
-      Serial.println(String(file)+" : ECHEC");
+
+      Serial.print(file);Serial.println(" : ECHEC de l'ouverture");
+
     }
     dFile.close();
+  }
+  if(btn.readButtons()==4){
+    isDoingSmth = 0;
   }
 }
 
 void refreshGPS(){
   while(ss.available() > 0)
     if(gps.encode(ss.read())){
-      Serial.print("debug : "); Serial.println(displayInfo(pt));
-      pt++;
+      //String ct = displayInfo(pt);
+      //Serial.print("debug : "); Serial.println(ct);
+      //pt++;
     }
+
   if (millis() > 6000 && gps.charsProcessed() < 10){
+
     Serial.println(F("No GPS detected: check wiring"));
     while(true);
+
   }
 }
