@@ -82,22 +82,28 @@ void loop() {
       lcd.print(currentState);
 
       if(isDoingSmth == 1){
+        int compteur = 1;
+        sprintf(fileName, "Trajet%d.txt", compteur);
+        while(SD.exists(fileName)){
+          Serial.println(fileName);
+          dFile = SD.open(fileName);
 
-        Serial.println(NAME_FILE);
-        dFile = SD.open(NAME_FILE);
+          if (dFile) {
 
-        if (dFile) {
+            Serial.println("contenu :");
+            // read from the file until there's nothing else in it:
+            while (dFile.available()) Serial.write(dFile.read());
+            // close the file:
+            dFile.close();
 
-          Serial.println("contenu :");
-          // read from the file until there's nothing else in it:
-          while (dFile.available()) Serial.write(dFile.read());
-          // close the file:
-          dFile.close();
-
-        } else Serial.println("Trajet.txt : error opening ");
+          } else Serial.println("Trajet.txt : error opening ");
+          SD.remove(fileName);
+          compteur++;
+          sprintf(fileName, "Trajet%d.txt", compteur);
+        }
 
         isDoingSmth = 0;
-
+        fileIndex = 0;
       }
       break;
 
@@ -141,6 +147,8 @@ void displayInfo(int p){
 
   if(gps.location.isValid()){
 
+    lcd.setCursor(0,1);
+    lcd.print("Sig fnd!");
     dtostrf(gps.location.lat(), 3, 6, &infos[strlen(infos)]);
     sprintf(&infos[strlen(infos)], "%s", ";");
     dtostrf(gps.location.lng(), 3, 6, &infos[strlen(infos)]);
@@ -172,64 +180,80 @@ void gpsLocation(){
 
   lcd.setCursor(0, 1);
   lcd.print("Wait sig");
+  sprintf(fileName, "Trajet%d.txt", fileIndex);
 
-  if(SD.exists(NAME_FILE) && !isWriting){
+  while(SD.exists(fileName) && !isWriting){
+
+    fileIndex++;
+    sprintf(fileName, "Trajet%d.txt", fileIndex);
+
+  }
+
+  /*if(SD.exists(NAME_FILE) && !isWriting){
     Serial.print("delet ");Serial.println(SD.remove(NAME_FILE));
     isWriting = true;
   }
-  else{
+  else{*/
 
-    dFile = SD.open(NAME_FILE, FILE_WRITE);
+    dFile = SD.open(fileName, FILE_WRITE);
 
     if(dFile){
 
-      Serial.print(NAME_FILE);Serial.print(" c ");
+      Serial.print(fileName);Serial.print(" c ");
 
     }else{
 
-      Serial.print(NAME_FILE);Serial.println(" : ECHEC");
+      Serial.print(fileName);Serial.println(" : ECHEC");
 
     }
 
     dFile.close();
 
-    if(SD.exists(NAME_FILE) == true){
+    if(SD.exists(fileName) == true && !isWriting){
 
       isWriting = true;
-      Serial.print(NAME_FILE);Serial.println(" e");
-      dFile = SD.open(NAME_FILE, FILE_WRITE);
+      Serial.print(fileName);Serial.println(" e");
+      dFile = SD.open(fileName, FILE_WRITE);
 
       if(dFile){
 
         Serial.println(infos);
         dFile.println(fileHeader);
         dFile.close();
+        isWriting = true;
 
       }else{
 
-        Serial.print(NAME_FILE);Serial.println(" : cECHEC");
+        Serial.print(fileName);Serial.println(" : cECHEC");
 
       }
     }
 
     Serial.print("Point n° :");Serial.println(pt);
     displayInfo(pt);
-    dFile = SD.open(NAME_FILE, FILE_WRITE);
+    dFile = SD.open(fileName, FILE_WRITE);
 
     if(dFile){
 
+      Serial.println(infos);
       dFile.println(infos);
       pt++;
 
-    }else Serial.print(NAME_FILE);Serial.println(" : oECHEC");
+    }else{
+
+      Serial.print(fileName);Serial.println(" : oECHEC");
+
+    }
 
     dFile.close();
-  }
+//  }
 
   if(btn.readButtons()==4){
     isDoingSmth = 0;
     isWriting = false;
     pt = 0;
+    lcd.setCursor(0, 1);
+    lcd.print("        ");
   }
   delay(1000);
 }
