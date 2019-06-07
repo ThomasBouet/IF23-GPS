@@ -15,11 +15,11 @@ void setup() {
 
   if (!SD.begin(SD_CS)) {
     //carte pas insérée, mauvais branchement, mauvais pin
-    Serial.println("Carte mal insérée/Mauvais branchement/Mauvais pin");
+    Serial.println("Probleme SD");
 
   } else {
    //Branchement correct et carte insérée
-    Serial.println("Branchement correct et carte insérée");
+    Serial.println("SD ok");
 
   }
 }
@@ -166,22 +166,23 @@ void displayInfo(int p){
 
   if(gps.satellites.isValid()) sprintf(&infos[strlen(infos)], "%d;", gps.satellites.value());
   else sprintf(&infos[strlen(infos)], "%s","SAT INVALID;");
-
-  Serial.println(infos);
 }
 
 void gpsLocation(){
 
   lcd.setCursor(0, 1);
   lcd.print("Wait sig");
-  Serial.println(NAME_FILE);
+
   if(SD.exists(NAME_FILE)){
+    Serial.print("delet ");Serial.println(SD.remove(NAME_FILE));
+  }
+  else{
 
     dFile = SD.open(NAME_FILE, FILE_WRITE);
 
     if(dFile){
 
-      Serial.print(NAME_FILE);Serial.println(" a été créé");
+      Serial.print(NAME_FILE);Serial.println("c");
 
     }else{
 
@@ -194,22 +195,22 @@ void gpsLocation(){
     if(SD.exists(NAME_FILE) == true){
 
       isWriting = true;
-      Serial.print(NAME_FILE);Serial.println(" exist");
+      Serial.print(NAME_FILE);Serial.println(" e");
       dFile = SD.open(NAME_FILE, FILE_WRITE);
 
       if(dFile){
 
-
+        Serial.println(infos);
         dFile.println(lineTitle);
         dFile.close();
 
       }else{
 
-        Serial.print(NAME_FILE);Serial.println(" : ECHEC de la création");
+        Serial.print(NAME_FILE);Serial.println(" : cECHEC");
 
       }
     }
-  }else{
+
 
     displayInfo(pt);
     dFile = SD.open(NAME_FILE, FILE_WRITE);
@@ -221,10 +222,9 @@ void gpsLocation(){
       pt++;
       delay(1000);
 
-    }else Serial.print(NAME_FILE);Serial.println(" : ECHEC de l'ouverture");
+    }else Serial.print(NAME_FILE);Serial.println(" : oECHEC");
 
     dFile.close();
-
   }
 
   if(btn.readButtons()==4) isDoingSmth = 0;
