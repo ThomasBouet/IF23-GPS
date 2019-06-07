@@ -30,7 +30,6 @@ LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
 
 //sd
 File dFile;
-File root;
 int fileIndex;
 bool isWriting;
 
@@ -59,7 +58,7 @@ SoftwareSerial ss(GPS_RX, GPS_TX);
 int pt;
 char infos[66];
 char fileName[13];
-const char lineTitle[56] = "Point,Latitude,Longitude,Altitude,Date,HDOP,Satellites;";
+const char fileHeader[56] = "Point,Latitude,Longitude,Altitude,Date,HDOP,Satellites;";
 #define NAME_FILE "Trajet.txt"
 
 //fonctions

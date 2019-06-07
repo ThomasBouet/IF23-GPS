@@ -22,6 +22,7 @@ void setup() {
     Serial.println("SD ok");
 
   }
+  isWriting = false;
 }
 
 void loop() {
@@ -49,7 +50,6 @@ void loop() {
 
     case 4 :
       isDoingSmth = 1;
-      pt = 0;
       break;
 
   }
@@ -137,7 +137,7 @@ void printDateTime(){
 void displayInfo(int p){
 
   memset(infos, 0, sizeof infos);
-  sprintf(&infos[strlen(infos)], "Point%d;", p);
+  sprintf(&infos[strlen(infos)], "%d;", p);
 
   if(gps.location.isValid()){
 
@@ -173,8 +173,9 @@ void gpsLocation(){
   lcd.setCursor(0, 1);
   lcd.print("Wait sig");
 
-  if(SD.exists(NAME_FILE)){
+  if(SD.exists(NAME_FILE) && !isWriting){
     Serial.print("delet ");Serial.println(SD.remove(NAME_FILE));
+    isWriting = true;
   }
   else{
 
@@ -182,7 +183,7 @@ void gpsLocation(){
 
     if(dFile){
 
-      Serial.print(NAME_FILE);Serial.println("c");
+      Serial.print(NAME_FILE);Serial.print(" c ");
 
     }else{
 
@@ -201,7 +202,7 @@ void gpsLocation(){
       if(dFile){
 
         Serial.println(infos);
-        dFile.println(lineTitle);
+        dFile.println(fileHeader);
         dFile.close();
 
       }else{
@@ -211,24 +212,26 @@ void gpsLocation(){
       }
     }
 
-
+    Serial.print("Point n° :");Serial.println(pt);
     displayInfo(pt);
     dFile = SD.open(NAME_FILE, FILE_WRITE);
-    Serial.println(dFile);
 
     if(dFile){
 
       dFile.println(infos);
       pt++;
-      delay(1000);
 
     }else Serial.print(NAME_FILE);Serial.println(" : oECHEC");
 
     dFile.close();
   }
 
-  if(btn.readButtons()==4) isDoingSmth = 0;
-
+  if(btn.readButtons()==4){
+    isDoingSmth = 0;
+    isWriting = false;
+    pt = 0;
+  }
+  delay(1000);
 }
 
 void refreshGPS(){
