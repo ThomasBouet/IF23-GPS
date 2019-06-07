@@ -57,3 +57,11 @@ float tension;
 TinyGPSPlus gps;
 SoftwareSerial ss(GPS_RX, GPS_TX);
 int pt;
+char infos[66];
+char fileName[13];
+const char lineTitle[56] = "Point,Latitude,Longitude,Altitude,Date,HDOP,Satellites;";
+#define NAME_FILE "Trajet.txt"
+
+//fonctions
+void refreshGPS();
+void gpsLocation();
