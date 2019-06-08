@@ -147,8 +147,13 @@ void displayInfo(int p){
 
   if(gps.location.isValid()){
 
-    lcd.setCursor(0,1);
-    lcd.print("Sig fnd!");
+    if(currentState == GPS_REC){
+
+      lcd.setCursor(0,1);
+      lcd.print("Sig fnd!");
+    
+    }
+    
     dtostrf(gps.location.lat(), 3, 6, &infos[strlen(infos)]);
     sprintf(&infos[strlen(infos)], "%s", ";");
     dtostrf(gps.location.lng(), 3, 6, &infos[strlen(infos)]);
@@ -262,9 +267,9 @@ void refreshGPS(){
 
   while(ss.available() > 0)
     if(gps.encode(ss.read())){
-      /*displayInfo(pt);
+      displayInfo(pt);
       Serial.print("debug : "); Serial.println(infos);
-      pt++;*/
+      pt++;
     }
 
   if (millis() > 6000 && gps.charsProcessed() < 10){
