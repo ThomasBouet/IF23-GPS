@@ -151,9 +151,10 @@ void displayInfo(int p){
 
       lcd.setCursor(0,1);
       lcd.print("Sig fnd!");
-    
+
     }
-    
+
+    locating = true;
     dtostrf(gps.location.lat(), 3, 6, &infos[strlen(infos)]);
     sprintf(&infos[strlen(infos)], "%s", ";");
     dtostrf(gps.location.lng(), 3, 6, &infos[strlen(infos)]);
@@ -240,9 +241,11 @@ void gpsLocation(){
 
     if(dFile){
 
-      Serial.println(infos);
-      dFile.println(infos);
-      pt++;
+      if(locating){
+        Serial.println(infos);
+        dFile.println(infos);
+        pt++;
+      }else Serial.println("Lat & Lng innvalid");  
 
     }else{
 
