@@ -59,7 +59,7 @@ int pt;
 char infos[66];
 char fileName[13] = "Trajet";
 const char fileHeader[56] = "Point,Latitude,Longitude,Altitude,Date,HDOP,Satellites;";
-#define NAME_FILE "Trajet.txt"
+bool locating;
 
 //fonctions
 void refreshGPS();
