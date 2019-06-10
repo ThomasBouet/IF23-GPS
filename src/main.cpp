@@ -12,14 +12,16 @@ void setup() {
   currentState = BATTERY;
   //initialisation du compteur de points pris par le gps
   pt = 1;
-
+  ptDebug = 1;
   if (!SD.begin(SD_CS)) {
     //carte pas insérée, mauvais branchement, mauvais pin
     Serial.println("Probleme SD");
+    isSdOk = false;
 
   } else {
    //Branchement correct et carte insérée
     Serial.println("SD ok");
+    isSdOk = true;
 
   }
   isWriting = false;
@@ -60,21 +62,17 @@ void loop() {
 
   switch(currentState){
     case BATTERY :
-      lcd.setCursor(1, 1);
+      lcd.setCursor(4, 0);
       tension = (float)(analogRead(VBAT))/1023.0*6.5;
       lcd.print(tension);
       lcd.setCursor(0, 1);
-      lcd.print("V");
-      break;
-
-    case SD_SIZE :
-      lcd.setCursor(0,1);
-      lcd.print(currentState);
-      break;
-
-    case SD_FORM :
-      lcd.setCursor(0,1);
-      lcd.print(currentState);
+      lcd.print("SD");
+      lcd.setCursor(3, 1);
+      if(isSdOk){
+        lcd.print("Ok");
+      }else{
+        lcd.print("noOk");
+      }
       break;
 
     case USB :
@@ -83,6 +81,7 @@ void loop() {
 
       if(isDoingSmth == 1){
         int compteur = 1;
+        int ligneCompteur = 1;
         sprintf(fileName, "Trajet%d.txt", compteur);
         while(SD.exists(fileName)){
           Serial.println(fileName);
@@ -92,7 +91,16 @@ void loop() {
 
             Serial.println("contenu :");
             // read from the file until there's nothing else in it:
-            while (dFile.available()) Serial.write(dFile.read());
+            while (dFile.available()){
+              Serial.write(dFile.read());
+              ligneCompteur++;
+              if(ligneCompteur%1000 == 0){ 
+                while(btn.readButtons() != 4){
+                  lcd.setCursor(0, 1);
+                  lcd.print("p2c");
+                }
+              }
+            }
             // close the file:
             dFile.close();
 
@@ -108,8 +116,14 @@ void loop() {
       break;
 
     case GPS_REC :
+    lcd.setCursor(7, 0);
+
+      if(!gps.satellites.isValid()) lcd.print("X");
+      else lcd.print(gps.satellites.value());
+
       lcd.setCursor(0,1);
-      lcd.print(currentState);
+
+      if(!gps.location.isValid()) lcd.print("Srch sig");
       if(isDoingSmth == 1) gpsLocation();
       break;
 
@@ -270,9 +284,9 @@ void refreshGPS(){
 
   while(ss.available() > 0)
     if(gps.encode(ss.read())){
-      displayInfo(pt);
-      Serial.print("debug : "); Serial.println(infos);
-      pt++;
+      displayInfo(ptDebug);
+      //Serial.print("debug : "); Serial.println(infos);
+      ptDebug++;
     }
 
   if (millis() > 6000 && gps.charsProcessed() < 10){

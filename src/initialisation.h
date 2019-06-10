@@ -37,13 +37,16 @@ bool isWriting;
 ButtonsGPS btn;
 
 //menu
-const int BATTERY = 0, SD_SIZE = 1, SD_FORM = 2, USB = 3, GPS_REC = 4;
-const int MENU_SIZE = 5;
+const int BATTERY = 0, USB = 1, GPS_REC = 2;
+const int MENU_SIZE = 3;
 const int navMenu [] = {
-  BATTERY, SD_SIZE, SD_FORM, USB, GPS_REC
+  BATTERY, USB, GPS_REC
 };
-const String titleMenu [] = {
-  "Battery", "SD_Size", "SD_Form", "USB", "GPS_Rec"
+const char title1[4] = "Bat";
+const char title2[4] = "USB";
+const char title3[4] = "GPS";
+const char * titleMenu [] = {
+  title1, title2, title3
 };
 int button;
 int currentState;
@@ -56,10 +59,14 @@ float tension;
 TinyGPSPlus gps;
 SoftwareSerial ss(GPS_RX, GPS_TX);
 int pt;
+int ptDebug;
 char infos[66];
 char fileName[13] = "Trajet";
-const char fileHeader[56] = "Point,Latitude,Longitude,Altitude,Date,HDOP,Satellites;";
+const char fileHeader[56] = "Point;Latitude;Longitude;Altitude;Date;HDOP;Satellites;";
 bool locating;
+
+//SD
+bool isSdOk;
 
 //fonctions
 void refreshGPS();
