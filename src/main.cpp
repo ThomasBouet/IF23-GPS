@@ -94,7 +94,7 @@ void loop() {
             while (dFile.available()){
               Serial.write(dFile.read());
               ligneCompteur++;
-              if(ligneCompteur%1000 == 0){ 
+              if(ligneCompteur%62700 == 0){ 
                 while(btn.readButtons() != 4){
                   lcd.setCursor(0, 1);
                   lcd.print("p2c");
@@ -116,7 +116,7 @@ void loop() {
       break;
 
     case GPS_REC :
-    lcd.setCursor(7, 0);
+      lcd.setCursor(7, 0);
 
       if(!gps.satellites.isValid()) lcd.print("X");
       else lcd.print(gps.satellites.value());
@@ -129,7 +129,7 @@ void loop() {
 
   }
 
-refreshGPS();
+refreshGPS(1000);
   //maj de l'état
   delay(10);
 }
@@ -209,45 +209,39 @@ void gpsLocation(){
 
   }
 
-  /*if(SD.exists(NAME_FILE) && !isWriting){
-    Serial.print("delet ");Serial.println(SD.remove(NAME_FILE));
-    isWriting = true;
-  }
-  else{*/
+  dFile = SD.open(fileName, FILE_WRITE);
 
+  if(dFile){
+
+    Serial.print(fileName);Serial.print(" c ");
+
+  }else{
+
+    Serial.print(fileName);Serial.println(" : ECHEC");
+
+  }
+
+  dFile.close();
+
+  if(SD.exists(fileName) == true && !isWriting){
+
+    isWriting = true;
+    Serial.print(fileName);Serial.println(" e");
     dFile = SD.open(fileName, FILE_WRITE);
 
     if(dFile){
 
-      Serial.print(fileName);Serial.print(" c ");
+      Serial.println(infos);
+      dFile.println(fileHeader);
+      dFile.close();
+      isWriting = true;
 
     }else{
 
-      Serial.print(fileName);Serial.println(" : ECHEC");
+      Serial.print(fileName);Serial.println(" : cECHEC");
 
     }
-
-    dFile.close();
-
-    if(SD.exists(fileName) == true && !isWriting){
-
-      isWriting = true;
-      Serial.print(fileName);Serial.println(" e");
-      dFile = SD.open(fileName, FILE_WRITE);
-
-      if(dFile){
-
-        Serial.println(infos);
-        dFile.println(fileHeader);
-        dFile.close();
-        isWriting = true;
-
-      }else{
-
-        Serial.print(fileName);Serial.println(" : cECHEC");
-
-      }
-    }
+  }
 
     Serial.print("Point n° :");Serial.println(pt);
     displayInfo(pt);
@@ -256,9 +250,12 @@ void gpsLocation(){
     if(dFile){
 
       if(locating){
+        
         Serial.println(infos);
         dFile.println(infos);
         pt++;
+        memset(infos, 0, sizeof infos);
+
       }else Serial.println("Lat & Lng innvalid");  
 
     }else{
@@ -277,22 +274,17 @@ void gpsLocation(){
     lcd.setCursor(0, 1);
     lcd.print("        ");
   }
-  delay(1000);
 }
 
-void refreshGPS(){
-
-  while(ss.available() > 0)
+void refreshGPS(unsigned long ms){
+  unsigned long start = millis();
+  do
+  {
+    while(ss.available() > 0)
     if(gps.encode(ss.read())){
       displayInfo(ptDebug);
       //Serial.print("debug : "); Serial.println(infos);
       ptDebug++;
     }
-
-  if (millis() > 6000 && gps.charsProcessed() < 10){
-
-    Serial.println(F("No GPS detected: check wiring"));
-    while(true);
-
-  }
+  }while(millis() - start < ms);
 }

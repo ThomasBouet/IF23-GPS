@@ -69,5 +69,5 @@ bool locating;
 bool isSdOk;
 
 //fonctions
-void refreshGPS();
+void refreshGPS(unsigned long);
 void gpsLocation();
